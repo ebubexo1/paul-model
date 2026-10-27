@@ -83,7 +83,7 @@ export default function App() {
 <p>
   <a href={`https://wa.me/${model.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp</a>
   {" | "}
-  <a href={`tel:${model.phone}`}>{model.phone}</a>
+          <a href={`tel:${model.phone}`}>Call</a>
   {" | "}
   <a href={`mailto:${model.email}`}>{model.email}</a>
 </p>
