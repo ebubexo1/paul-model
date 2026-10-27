@@ -1,209 +1,149 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { profile, photos, categories } from "./data.js";
+import { useEffect, useState } from "react";
+import { model, photos, heroPhoto } from "./data.js";
 
-const img = (name) => `${import.meta.env.BASE_URL}images/${name}`;
-
-function Header() {
-  return (
-    <header className="nav">
-      <a href="#top" className="nav-name">{profile.name}</a>
-      <nav aria-label="Primary">
-        <a href="#work">Work</a>
-        <a href="#about">About</a>
-        <a href="#contact" className="nav-cta">Book me</a>
-      </nav>
-    </header>
-  );
-}
-
-function Hero() {
-  const [first, ...rest] = profile.name.split(" ");
-  return (
-    <section className="hero" id="top">
-      <div className="hero-copy">
-        <p className="hero-role">
-          <span className="dot" aria-hidden="true" /> {profile.role}, open to bookings
-        </p>
-        <h1>
-          <span>{first}</span>
-          <span>{rest.join(" ")}</span>
-        </h1>
-        <p className="hero-lede">
-          Clean frames, sharp tailoring, easy on set. See the work, then send a brief.
-        </p>
-        <div className="hero-actions">
-          <a className="btn btn-solid" href="#contact">Book a shoot</a>
-          <a className="btn btn-line" href="#work">View portfolio</a>
-        </div>
-      </div>
-      <figure className="hero-photo">
-        <img src={img("pink-standing.jpg")} alt={`${profile.name} in a pink shirt and wide black trousers`} />
-      </figure>
-    </section>
-  );
-}
-
-function Lightbox({ items, index, onClose, onMove }) {
-  const closeRef = useRef(null);
-  const item = items[index];
-
+function Lightbox({ index, onClose, onMove }) {
   useEffect(() => {
-    const prev = document.activeElement;
-    closeRef.current?.focus();
-    document.body.style.overflow = "hidden";
     const onKey = (e) => {
       if (e.key === "Escape") onClose();
       if (e.key === "ArrowRight") onMove(1);
       if (e.key === "ArrowLeft") onMove(-1);
     };
     window.addEventListener("keydown", onKey);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
-      prev?.focus?.();
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose, onMove]);
 
-  const touch = useRef(null);
+  const photo = photos[index];
   return (
-    <div
-      className="lightbox"
-      role="dialog"
-      aria-modal="true"
-      aria-label={item.title}
-      onClick={onClose}
-      onTouchStart={(e) => (touch.current = e.touches[0].clientX)}
-      onTouchEnd={(e) => {
-        const dx = e.changedTouches[0].clientX - touch.current;
-        if (Math.abs(dx) > 50) onMove(dx < 0 ? 1 : -1);
-      }}
-    >
-      <button ref={closeRef} className="lb-btn lb-close" onClick={onClose} aria-label="Close">✕</button>
-      <button className="lb-btn lb-prev" onClick={(e) => { e.stopPropagation(); onMove(-1); }} aria-label="Previous photo">‹</button>
-      <figure onClick={(e) => e.stopPropagation()}>
-        <img src={img(item.src)} alt={item.title} />
-        <figcaption>
-          {item.title}
-          <span>{index + 1} of {items.length}</span>
-        </figcaption>
-      </figure>
-      <button className="lb-btn lb-next" onClick={(e) => { e.stopPropagation(); onMove(1); }} aria-label="Next photo">›</button>
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" onClick={onClose}>
+      <img src={photo.src} alt={photo.alt} onClick={(e) => e.stopPropagation()} />
+      <button className="lb-btn lb-close" onClick={onClose} aria-label="Close">Close</button>
+      <button className="lb-btn lb-prev" onClick={(e) => { e.stopPropagation(); onMove(-1); }} aria-label="Previous photo">Prev</button>
+      <button className="lb-btn lb-next" onClick={(e) => { e.stopPropagation(); onMove(1); }} aria-label="Next photo">Next</button>
     </div>
   );
 }
 
-function Work() {
-  const [cat, setCat] = useState("All");
-  const [open, setOpen] = useState(null);
-  const items = useMemo(
-    () => (cat === "All" ? photos : photos.filter((p) => p.category === cat)),
-    [cat]
-  );
-  const move = useCallback(
-    (d) => setOpen((i) => (i === null ? i : (i + d + items.length) % items.length)),
-    [items.length]
-  );
-  const close = useCallback(() => setOpen(null), []);
+function BookingForm() {
+  const [form, setForm] = useState({
+    name: "", email: "", phone: "", type: model.jobTypes[0], date: "", message: "",
+  });
+  const [sent, setSent] = useState(false);
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  const submit = (e) => {
+    e.preventDefault();
+    const subject = `Booking request: ${form.type}`;
+    const body = [
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      `Phone: ${form.phone}`,
+      `Job type: ${form.type}`,
+      `Date: ${form.date || "Not set"}`,
+      "",
+      form.message,
+    ].join("\n");
+    window.location.href = `mailto:${model.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    setSent(true);
+  };
 
   return (
-    <section className="section" id="work">
-      <div className="section-head">
-        <h2>Selected work</h2>
-        <div className="filters" role="group" aria-label="Filter photos">
-          {categories.map((c) => (
-            <button
-              key={c}
-              className={c === cat ? "chip on" : "chip"}
-              aria-pressed={c === cat}
-              onClick={() => setCat(c)}
-            >
-              {c}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <ul className="grid">
-        {items.map((p, i) => (
-          <li key={p.src} style={{ aspectRatio: `${p.w} / ${p.h}` }}>
-            <button onClick={() => setOpen(i)} aria-label={`Open ${p.title}`}>
-              <img src={img(p.src)} alt={p.title} loading="lazy" width={p.w} height={p.h} />
-              <span className="cap">{p.title}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      {open !== null && <Lightbox items={items} index={open} onClose={close} onMove={move} />}
-    </section>
+    <form className="booking" onSubmit={submit}>
+      <label>Your name
+        <input required value={form.name} onChange={set("name")} autoComplete="name" />
+      </label>
+      <label>Email
+        <input required type="email" value={form.email} onChange={set("email")} autoComplete="email" />
+      </label>
+      <label>Phone or WhatsApp
+        <input value={form.phone} onChange={set("phone")} autoComplete="tel" />
+      </label>
+      <label>Type of job
+        <select value={form.type} onChange={set("type")}>
+          {model.jobTypes.map((t) => <option key={t}>{t}</option>)}
+        </select>
+      </label>
+      <label>Preferred date
+        <input type="date" value={form.date} onChange={set("date")} />
+      </label>
+      <label className="wide">Project details
+        <textarea rows="4" required value={form.message} onChange={set("message")} placeholder="Brand, location, usage, budget" />
+      </label>
+      <button className="cta" type="submit">Send booking request</button>
+      {sent && (
+        <p className="note" role="status">
+          Your email app should open with the request filled in. If it does not, write to {model.email}.
+        </p>
+      )}
+    </form>
   );
 }
 
-function About() {
-  const stats = profile.stats.filter((s) => s.value.trim());
+export default function App() {
+  const [open, setOpen] = useState(null);
+  const move = (d) => setOpen((i) => (i + d + photos.length) % photos.length);
+  const stats = model.stats.filter((s) => s.value);
+
   return (
-    <section className="section about" id="about">
-      <figure className="about-photo">
-        <img src={img("white-shirt.jpg")} alt={`${profile.firstName} in a white shirt and leather cap`} loading="lazy" />
-      </figure>
-      <div className="about-body">
-        <h2>About {profile.firstName}</h2>
-        {profile.bio.map((t, i) => <p key={i}>{t}</p>)}
+    <>
+      <header className="top">
+        <a href="#top" className="brand">{model.name}</a>
+        <nav>
+          <a href="#work">Work</a>
+          <a href="#about">About</a>
+          <a href="#book" className="pill">Book me</a>
+        </nav>
+      </header>
 
-        <h3>Available for</h3>
-        <ul className="tags">
-          {profile.services.map((s) => <li key={s}>{s}</li>)}
-        </ul>
+      <main id="top">
+        <section className="hero">
+          <div className="hero-text">
+            <p className="role"><span className="dot" aria-hidden="true" />{model.role}</p>
+            <h1><span>{model.first}</span><span className="pink">{model.last}</span></h1>
+            <p className="intro">{model.intro[0]}<br />{model.intro[1]}</p>
+            <div className="btns">
+              <a className="cta" href="#book">Book a shoot</a>
+              <a className="ghost" href="#work">View portfolio</a>
+            </div>
+          </div>
+          <img className="hero-img" src={heroPhoto.src} alt={heroPhoto.alt} />
+        </section>
 
-        {stats.length > 0 && (
-          <>
-            <h3>Stats</h3>
+        <section id="work" className="section">
+          <h2>Work</h2>
+          <div className="grid">
+            {photos.map((ph, i) => (
+              <button key={ph.src} className="tile" onClick={() => setOpen(i)} aria-label={`Open photo: ${ph.alt}`}>
+                <img src={ph.src} alt={ph.alt} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section id="about" className="section about">
+          <h2>About</h2>
+          <p className="bio">{model.bio}</p>
+          {stats.length > 0 && (
             <dl className="stats">
               {stats.map((s) => (
                 <div key={s.label}><dt>{s.label}</dt><dd>{s.value}</dd></div>
               ))}
             </dl>
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
+          )}
+        </section>
 
-function Contact() {
-  const wa = `https://wa.me/${profile.whatsapp}?text=${encodeURIComponent("Hi Chibueze, I saw your portfolio and I'd like to book you.")}`;
-  return (
-    <section className="section contact" id="contact">
-      <h2>Let's book a shoot</h2>
-      <p className="contact-lede">Call, text or message me the date, the location and what you are shooting. I reply within a day.</p>
-      <div className="contact-actions">
-        <a className="btn btn-solid" href={`tel:${profile.phone}`}>Call {profile.phone}</a>
-        <a className="btn btn-line" href={`sms:${profile.phone}`}>Send a text</a>
-        <a className="btn btn-line" href={wa} target="_blank" rel="noreferrer">WhatsApp</a>
-        <a className="btn btn-line" href={`mailto:${profile.email}`}>Email</a>
-        {profile.instagram && (
-          <a className="btn btn-line" href={profile.instagram} target="_blank" rel="noreferrer">Instagram</a>
-        )}
-      </div>
-      <p className="contact-email">{profile.email}</p>
-    </section>
-  );
-}
-
-export default function App() {
-  return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <Work />
-        <About />
-        <Contact />
+        <section id="book" className="section">
+          <h2>Book a shoot</h2>
+          <p className="lead">Tell us about the job. You will get a reply by email.</p>
+          <BookingForm />
+        </section>
       </main>
-      <footer className="foot">
-        <span>© {new Date().getFullYear()} {profile.name}</span>
-        <a href="#top">Back to top</a>
+
+      <footer>
+        <span>{model.name}</span>
+        <span>{new Date().getFullYear()}</span>
       </footer>
+
+      {open !== null && <Lightbox index={open} onClose={() => setOpen(null)} onMove={move} />}
     </>
   );
 }
