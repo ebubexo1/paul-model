@@ -1,4 +1,4 @@
-// Edit this file to update the site. No other file needs to change for content.
+﻿// Edit this file to update the site. No other file needs to change for content.
 export const model = {
   name: "Chibueze Gozie Paul",
   first: "Chibueze",
@@ -6,7 +6,11 @@ export const model = {
   role: "Fashion & lifestyle model, open to bookings",
   intro: ["Clean frames, sharp tailoring, easy on set.", "See the work, then send a brief."],
   bio: "Chibueze works across streetwear, lifestyle and campaign shoots. He is easy to direct, arrives prepared and delivers a clean set of frames every time.",
-  email: "your-email@example.com", // booking requests go here
+  email: "goziechibueze20@gmail.com", // booking requests go here
+  phone: "09040916762",
+  whatsapp: "2349040916762",
+  phone: "09040916762",
+  whatsapp: "2349040916762",
   // Fill in what you want shown. Empty values are hidden.
   stats: [
     { label: "Height", value: "" },
@@ -36,3 +40,4 @@ export const photos = [
   p("stripe-shirt.jpg", "Striped shirt"),
   p("guitar-wall.jpg", "Guitar wall"),
 ];
+

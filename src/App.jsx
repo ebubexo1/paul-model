@@ -79,7 +79,14 @@ export default function App() {
 
         <section id="book" className="section">
           <h2>Book a shoot</h2>
-          <p className="lead">To book, email <a href={`mailto:${model.email}`}>{model.email}</a>.</p>
+          <p className="lead">To book, reach out directly:</p>
+<p>
+  <a href={`https://wa.me/${model.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp</a>
+  {" | "}
+  <a href={`tel:${model.phone}`}>{model.phone}</a>
+  {" | "}
+  <a href={`mailto:${model.email}`}>{model.email}</a>
+</p>
         </section>
       </main>
 
@@ -92,3 +99,4 @@ export default function App() {
     </>
   );
 }
+
