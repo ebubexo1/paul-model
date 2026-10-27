@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { model, photos, heroPhoto } from "./data.js";
 
 function Lightbox({ index, onClose, onMove }) {
@@ -23,60 +23,6 @@ function Lightbox({ index, onClose, onMove }) {
   );
 }
 
-function BookingForm() {
-  const [form, setForm] = useState({
-    name: "", email: "", phone: "", type: model.jobTypes[0], date: "", message: "",
-  });
-  const [sent, setSent] = useState(false);
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
-
-  const submit = (e) => {
-    e.preventDefault();
-    const subject = `Booking request: ${form.type}`;
-    const body = [
-      `Name: ${form.name}`,
-      `Email: ${form.email}`,
-      `Phone: ${form.phone}`,
-      `Job type: ${form.type}`,
-      `Date: ${form.date || "Not set"}`,
-      "",
-      form.message,
-    ].join("\n");
-    window.location.href = `mailto:${model.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setSent(true);
-  };
-
-  return (
-    <form className="booking" onSubmit={submit}>
-      <label>Your name
-        <input required value={form.name} onChange={set("name")} autoComplete="name" />
-      </label>
-      <label>Email
-        <input required type="email" value={form.email} onChange={set("email")} autoComplete="email" />
-      </label>
-      <label>Phone or WhatsApp
-        <input value={form.phone} onChange={set("phone")} autoComplete="tel" />
-      </label>
-      <label>Type of job
-        <select value={form.type} onChange={set("type")}>
-          {model.jobTypes.map((t) => <option key={t}>{t}</option>)}
-        </select>
-      </label>
-      <label>Preferred date
-        <input type="date" value={form.date} onChange={set("date")} />
-      </label>
-      <label className="wide">Project details
-        <textarea rows="4" required value={form.message} onChange={set("message")} placeholder="Brand, location, usage, budget" />
-      </label>
-      <button className="cta" type="submit">Send booking request</button>
-      {sent && (
-        <p className="note" role="status">
-          Your email app should open with the request filled in. If it does not, write to {model.email}.
-        </p>
-      )}
-    </form>
-  );
-}
 
 export default function App() {
   const [open, setOpen] = useState(null);
@@ -133,8 +79,7 @@ export default function App() {
 
         <section id="book" className="section">
           <h2>Book a shoot</h2>
-          <p className="lead">Tell us about the job. You will get a reply by email.</p>
-          <BookingForm />
+          <p className="lead">To book, email <a href={`mailto:${model.email}`}>{model.email}</a>.</p>
         </section>
       </main>
 
