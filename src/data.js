@@ -32,6 +32,7 @@ export const photos = [
   p("look-2.jpeg", "Leaning back in a red armchair, wide-leg black trousers"),
   p("look-5.jpeg", "Sitting on a black sofa beside a patterned window blind"),
   p("look-4.jpeg", "Low angle by a white cabinet, red armchairs behind"),
+  p("look-6.jpeg", "Seated on a maroon sofa with a hand over the face, holding a teal shoebox, Nike boxes beside, black cap and wide-leg black trousers"),
   p("black-kaftan.jpg", "Black kaftan look"),
   p("pink-standing.jpg", "Standing against a dark door in a pink shirt"),
   p("pink-seated.jpg", "Seated in pink"),
