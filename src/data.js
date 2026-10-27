@@ -11,6 +11,8 @@ export const model = {
   whatsapp: "2349040916762",
   phone: "09040916762",
   whatsapp: "2349040916762",
+  phone: "09040916762",
+  whatsapp: "2349040916762",
   // Fill in what you want shown. Empty values are hidden.
   stats: [
     { label: "Height", value: "" },
